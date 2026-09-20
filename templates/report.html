@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Photopath - Report</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+
+        <div class="logo">
+            💡 Photopath
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="map.html">Map</a>
+            <a href="report.html" class="active">Report</a>
+        </div>
+
+    </nav>
+
+
+    <main class="report-page">
+
+        <section class="report-container">
+
+            <div class="report-header">
+
+                <div class="report-icon">
+                    🚨
+                </div>
+
+                <h1>
+                    Report a Streetlight
+                </h1>
+
+                <p>
+                    Help improve Photopath's lighting map
+                    by reporting lighting problems in your area.
+                </p>
+
+            </div>
+
+
+            <form id="report-form">
+
+                <!-- Problem Type -->
+                <div class="form-group">
+
+                    <label for="problem">
+                        What is wrong with the streetlight?
+                    </label>
+
+                    <select id="problem" required>
+
+                        <option value="">
+                            Select a problem...
+                        </option>
+
+                        <option value="broken">
+                            Broken
+                        </option>
+
+                        <option value="flickering">
+                            Flickering
+                        </option>
+
+                        <option value="dim">
+                            Very Dim
+                        </option>
+
+                        <option value="off">
+                            Completely Off
+                        </option>
+
+                        <option value="other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Location -->
+                <div class="form-group">
+
+                    <label>
+                        Location
+                    </label>
+
+                    <button
+                        type="button"
+                        class="location-button"
+                        id="report-location"
+                    >
+                        📍 Use My Current Location
+                    </button>
+
+                    <p
+                        class="location-status"
+                        id="location-status"
+                    >
+                        Location has not been selected.
+                    </p>
+
+                </div>
+
+
+                <!-- Description -->
+                <div class="form-group">
+
+                    <label for="description">
+                        Description
+                        <span>(optional)</span>
+                    </label>
+
+                    <textarea
+                        id="description"
+                        rows="5"
+                        placeholder="Describe the problem..."
+                    ></textarea>
+
+                </div>
+
+
+                <!-- Photo -->
+                <div class="form-group">
+
+                    <label for="photo">
+                        Add a Photo
+                        <span>(optional)</span>
+                    </label>
+
+                    <input
+                        type="file"
+                        id="photo"
+                        accept="image/*"
+                    >
+
+                    <p class="form-help">
+                        A photo can help verify the report.
+                    </p>
+
+                </div>
+
+
+                <!-- Submit -->
+                <button
+                    type="submit"
+                    class="primary-button submit-button"
+                >
+                    🚨 Submit Report
+                </button>
+
+            </form>
+
+
+            <!-- Privacy -->
+            <div class="privacy-notice">
+
+                <strong>🔒 Your privacy matters</strong>
+
+                <p>
+                    Photopath only needs the location and
+                    information necessary to process the report.
+                    Personal information is not required.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- How Reports Work -->
+        <section class="verification-card">
+
+            <h2>
+                How reports help
+            </h2>
+
+            <div class="verification-step">
+
+                <span>1</span>
+
+                <div>
+                    <strong>Community Report</strong>
+
+                    <p>
+                        Someone reports a broken or dim light.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="verification-step">
+
+                <span>2</span>
+
+                <div>
+                    <strong>Lighting Data</strong>
+
+                    <p>
+                        Photopath compares the report with
+                        lighting measurements.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="verification-step">
+
+                <span>3</span>
+
+                <div>
+                    <strong>Verification</strong>
+
+                    <p>
+                        Multiple reports and recent measurements
+                        increase confidence.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="verification-step">
+
+                <span>4</span>
+
+                <div>
+                    <strong>Lighting Map</strong>
+
+                    <p>
+                        Verified information can influence the
+                        visibility data shown to users.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+        <p>
+            Photopath • Community lighting information
+        </p>
+    </footer>
+
+
+    <script>
+
+        let latitude = null;
+        let longitude = null;
+
+
+        // Get location
+        document
+            .getElementById("report-location")
+            .addEventListener("click", function () {
+
+                const status =
+                    document.getElementById("location-status");
+
+                if (!navigator.geolocation) {
+
+                    status.textContent =
+                        "Geolocation is not supported.";
+
+                    return;
+
+                }
+
+                status.textContent =
+                    "Finding your location...";
+
+                navigator.geolocation.getCurrentPosition(
+
+                    function(position) {
+
+                        latitude =
+                            position.coords.latitude;
+
+                        longitude =
+                            position.coords.longitude;
+
+                        status.textContent =
+                            "✓ Location found.";
+
+                        console.log(
+                            "Latitude:",
+                            latitude
+                        );
+
+                        console.log(
+                            "Longitude:",
+                            longitude
+                        );
+
+                    },
+
+                    function() {
+
+                        status.textContent =
+                            "Unable to access your location.";
+
+                    }
+
+                );
+
+            });
+
+
+        // Submit report
+        document
+            .getElementById("report-form")
+            .addEventListener("submit", function(event) {
+
+                event.preventDefault();
+
+                const problem =
+                    document.getElementById("problem").value;
+
+                const description =
+                    document.getElementById("description").value;
+
+                console.log({
+                    problem: problem,
+                    description: description,
+                    latitude: latitude,
+                    longitude: longitude
+                });
+
+                alert(
+                    "Report submitted!\
+                    \n\nThis will eventually be saved to Supabase."
+                );
+
+            });
+
+    </script>
+
+</body>
+</html>

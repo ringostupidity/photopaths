@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PhotoPath - Map</title>
+
+    <!-- Leaflet CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Cantarell, Arial, sans-serif;
+            background: #eef1f5;
+            color: #1f2937;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 360px;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        .map-card {
+            position: relative;
+            height: 650px;
+            min-height: 400px;
+            border-radius: 18px;
+            overflow: hidden;
+            background: #dfe5eb;
+        }
+
+        /* IMPORTANT: Leaflet needs an explicit height */
+        #map {
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            background: #dfe5eb;
+        }
+
+        .map-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            z-index: 1000;
+            background: white;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 21px;
+        }
+
+        .field {
+            display: flex;
+            gap: 8px;
+        }
+
+        input {
+            flex: 1;
+            min-width: 0;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 12px 16px;
+            background: #3157d5;
+            color: white;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2647b8;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .secondary {
+            width: 100%;
+            background: #e8edf9;
+            color: #3157d5;
+        }
+
+        .secondary:hover {
+            background: #dce4f7;
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        .notice {
+            display: none;
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #fff4d6;
+            color: #765b00;
+            font-size: 13px;
+        }
+
+        .routes {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .empty {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .route {
+            padding: 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .route:hover {
+            background: #f8faff;
+        }
+
+        .route.active {
+            border: 2px solid #3157d5;
+            background: #f4f7ff;
+        }
+
+        .route-top,
+        .route-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .route-top {
+            font-weight: 600;
+        }
+
+        .route-meta {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .score {
+            color: #3157d5;
+            font-size: 12px;
+        }
+
+        .camera {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            min-height: 180px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #eef1f5;
+            text-align: center;
+        }
+
+        #camera {
+            display: none;
+            width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .map-card {
+                height: 500px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .layout {
+                padding: 10px;
+            }
+
+            .map-card {
+                height: 400px;
+            }
+
+            .field {
+                flex-direction: column;
+            }
+
+            .field button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <section class="map-card">
+            <div id="map"></div>
+        </section>
+
+        <aside class="panel">
+
+            <section class="card">
+                <h2>Where are you going?</h2>
+
+                <div class="field">
+                    <input
+                        id="destination"
+                        placeholder="Address, place, or landmark"
+                        autocomplete="off"
+                    >
+                    <button id="go">Go</button>
+                </div>
+
+                <button
+                    class="secondary"
+                    id="locate"
+                    style="margin-top:10px"
+                >
+                    Use my current location
+                </button>
+
+                <p class="hint">
+                    Your location stays in this browser and is only used
+                    to calculate the route.
+                </p>
+
+                <div class="notice" id="notice"></div>
+            </section>
+
+            <section class="card">
+                <h2>Suggested routes</h2>
+
+                <div class="routes" id="routes">
+                    <div class="empty">
+                        Set your location and destination to compare routes.
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Night check</h2>
+
+                <div class="camera" id="camera-box">
+                    <span id="camera-copy">
+                        Use your camera to check the scene ahead.
+                    </span>
+
+                    <video
+                        id="camera"
+                        autoplay
+                        playsinline
+                    ></video>
+
+                    <button id="camera-button">
+                        Open camera
+                    </button>
+                </div>
+
+            </section>
+
+        </aside>
+    </div>
+
+    <!-- Leaflet JavaScript MUST load before your map code -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // ==========================================
+        // MAP INITIALIZATION
+        // ==========================================
+
+        const map = L.map("map", {
+            zoomControl: false
+        }).setView([37.7749, -122.4194], 13);
+
+        L.control.zoom({
+            position: "bottomright"
+        }).addTo(map);
+
+        L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                attribution: "&copy; OpenStreetMap contributors"
+            }
+        ).addTo(map);
+
+        // Fix Leaflet tile positioning after the container is visible
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 200);
+
+        // Recalculate map size whenever the window changes
+        window.addEventListener("resize", () => {
+            map.invalidateSize();
+        });
+
+
+        // ==========================================
+        // VARIABLES
+        // ==========================================
+
+        let start = null;
+        let destination = null;
+        let routeLayers = [];
+        let startMarker;
+        let destinationMarker;
+        let currentRoutes = [];
+        let cameraStream = null;
+
+        const notice = document.getElementById("notice");
+
+
+        // ==========================================
+        // NOTICES
+        // ==========================================
+
+        const showNotice = (message) => {
+            notice.textContent = message;
+            notice.style.display = "block";
+        };
+
+        const clearNotice = () => {
+            notice.style.display = "none";
+        };
+
+
+        // ==========================================
+        // SET START LOCATION
+        // ==========================================
+
+        const setStart = (coords) => {
+            start = coords;
+
+            if (startMarker) {
+                map.removeLayer(startMarker);
+            }
+
+            startMarker = L.circleMarker(
+                [coords.lat, coords.lon],
+                {
+                    radius: 8,
+                    color: "#fff",
+                    weight: 3,
+                    fillColor: "#3157d5",
+                    fillOpacity: 1
+                }
+            )
+            .addTo(map)
+            .bindPopup("Your location");
+
+            if (destination) {
+                fetchRoutes();
+            }
+        };
+
+
+        // ==========================================
+        // GPS LOCATION
+        // ==========================================
+
+        document.getElementById("locate").onclick = () => {
+            clearNotice();
+
+            if (!navigator.geolocation) {
+                showNotice(
+                    "Location is not supported by this browser."
+                );
+                return;
+            }
+
+            showNotice("Finding your location...");
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setStart({
+                        lat: position.coords.latitude,
+                        lon: position.coords.longitude
+                    });
+
+                    map.setView(
+                        [start.lat, start.lon],
+                        15
+                    );
+
+                    clearNotice();
+                },
+                () => {
+                    showNotice(
+                        "Location permission was not available. " +
+                        "Check your browser settings and try again."
+                    );
+                }
+            );
+        };
+
+
+        // ==========================================
+        // DESTINATION SEARCH
+        // ==========================================
+
+        document.getElementById("go").onclick = async () => {
+            clearNotice();
+
+            const query = document
+                .getElementById("destination")
+                .value
+                .trim();
+
+            if (!query) {
+                showNotice("Enter a destination first.");
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/geocode", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                // Read the response as text first
+                const text = await response.text();
+
+                let data;
+
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    throw new Error(
+                        "The server returned an invalid response. " +
+                        "Make sure Flask is running."
+                    );
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Could not find destination.");
+                }
+
+                destination = data;
+
+                if (destinationMarker) {
+                    map.removeLayer(destinationMarker);
+                }
+
+                destinationMarker = L.marker([
+                    data.lat,
+                    data.lon
+                ])
+                .addTo(map)
+                .bindPopup(data.name);
+
+                if (!start) {
+                    map.setView([data.lat, data.lon], 14);
+
+                    showNotice(
+                        "Destination found. Tap “Use my current location” " +
+                        "to calculate a route."
+                    );
+                } else {
+                    fetchRoutes();
+                }
+
+            } catch (error) {
+                showNotice(error.message);
+                console.error(error);
+            }
+        };
+
+
+        // ==========================================
+        // FETCH ROUTES
+        // ==========================================
+
+        async function fetchRoutes() {
+            try {
+                const response = await fetch(
+                    "/api/route",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            start,
+                            end: {
+                                lat: destination.lat,
+                                lon: destination.lon
+                            }
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error);
+                }
+
+                currentRoutes = data.routes;
+
+                renderRoutes();
+
+                routeLayers.forEach((layer) => {
+                    map.removeLayer(layer);
+                });
+
+                routeLayers = [];
+
+                currentRoutes.forEach((route, index) => {
+                    const layer = L.geoJSON(
+                        route.geometry,
+                        {
+                            style: {
+                                color: index === 0
+                                    ? "#3157d5"
+                                    : "#91a0c9",
+
+                                weight: index === 0
+                                    ? 7
+                                    : 4,
+
+                                opacity: index === 0
+                                    ? 0.9
+                                    : 0.65,
+
+                                dashArray: index === 0
+                                    ? null
+                                    : "8 8"
+                            }
+                        }
+                    ).addTo(map);
+
+                    layer.on("click", () => {
+                        selectRoute(index);
+                    });
+
+                    routeLayers.push(layer);
+                });
+
+                const group = L.featureGroup([
+                    startMarker,
+                    destinationMarker,
+                    ...routeLayers
+                ]);
+
+                map.fitBounds(
+                    group.getBounds(),
+                    {
+                        padding: [30, 30]
+                    }
+                );
+
+            } catch (error) {
+                showNotice(
+                    error.message ||
+                    "Could not calculate a route."
+                );
+            }
+        }
+
+
+        // ==========================================
+        // DISPLAY ROUTES
+        // ==========================================
+
+        function renderRoutes() {
+            document.getElementById("routes").innerHTML =
+                currentRoutes.map((route, index) => `
+                    <div
+                        class="route ${index === 0 ? "active" : ""}"
+                        data-index="${index}"
+                    >
+                        <div class="route-top">
+                            <span>${route.label}</span>
+                            <span class="score">
+                                ${route.score}% light estimate
+                            </span>
+                        </div>
+
+                        <div class="route-meta">
+                            <span>${route.duration} min</span>
+                            <span>
+                                ${(route.distance / 1000).toFixed(1)} km
+                            </span>
+                        </div>
+                    </div>
+                `).join("");
+
+            document.querySelectorAll(".route").forEach((el) => {
+                el.onclick = () => {
+                    selectRoute(Number(el.dataset.index));
+                };
+            });
+        }
+
+
+        // ==========================================
+        // SELECT ROUTE
+        // ==========================================
+
+        function selectRoute(index) {
+            document.querySelectorAll(".route").forEach((el) => {
+                el.classList.toggle(
+                    "active",
+                    Number(el.dataset.index) === index
+                );
+            });
+
+            routeLayers.forEach((layer, i) => {
+                layer.setStyle({
+                    color: i === index
+                        ? "#3157d5"
+                        : "#91a0c9",
+
+                    weight: i === index
+                        ? 7
+                        : 4,
+
+                    opacity: i === index
+                        ? 0.9
+                        : 0.65
+                });
+            });
+        }
+
+
+        // ==========================================
+        // CAMERA
+        // ==========================================
+
+        document.getElementById("camera-button").onclick =
+            async () => {
+
+            try {
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach((track) => {
+                        track.stop();
+                    });
+
+                    cameraStream = null;
+
+                    document.getElementById("camera").style.display =
+                        "none";
+
+                    document.getElementById("camera-copy").style.display =
+                        "block";
+
+                    document.getElementById("camera-button").textContent =
+                        "Open camera";
+
+                    return;
+                }
+
+                cameraStream =
+                    await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: "environment"
+                        },
+                        audio: false
+                    });
+
+                document.getElementById("camera").srcObject =
+                    cameraStream;
+
+                document.getElementById("camera").style.display =
+                    "block";
+
+                document.getElementById("camera-copy").style.display =
+                    "none";
+
+                document.getElementById("camera-button").textContent =
+                    "Close camera";
+
+            } catch {
+                showNotice(
+                    "Camera access was not available. " +
+                    "Check browser permissions and try again."
+                );
+            }
+        };
+    </script>
+
+</body>
+</html>
