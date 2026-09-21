@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Photopath — Measure lighting</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/measure.js"></script>
+  </head>
+  <body>
+    <header data-header></header>
+    <main class="content-grid">
+      <section class="card">
+        <p class="eyebrow">A night check, right from your phone</p>
+        <h1>Bring light to the map.</h1>
+        <p class="section-intro">
+          Point your camera toward the path ahead to estimate the lighting.
+        </p>
+        <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+        <div class="camera-box">
+          <div id="camera-placeholder" class="camera-placeholder">
+            <span>📷</span>
+            <p>Your camera stays off until you open it.</p>
+          </div>
+          <video id="camera" autoplay playsinline muted hidden></video
+          ><canvas id="capture-preview" hidden></canvas>
+        </div>
+        <div class="button-row">
+          <button id="open-camera" class="primary-button">Open camera</button
+          ><button id="capture" class="secondary-button" disabled>Capture reading</button
+          ><button id="close-camera" class="secondary-button" hidden>Close camera</button>
+        </div>
+        <section id="reading" hidden>
+          <div class="measurement-display">
+            <strong id="score">—</strong>
+            <div>
+              <h3 id="score-label">Visibility estimate</h3>
+              <p class="hint">Relative score out of 100</p>
+            </div>
+          </div>
+          <div class="metrics">
+            <div><strong id="brightness">—</strong>Image brightness</div>
+            <div><strong id="darkness">—</strong>Very dark pixels</div>
+            <div><strong id="contrast">—</strong>Contrast</div>
+          </div>
+          <p id="measurement-location" class="hint"></p>
+          <label class="check form-group" style="margin-top: 18px"
+            ><input id="share-consent" type="checkbox" />Share this reading and location with the
+            community. The image stays on my device.</label
+          ><button id="save-measurement" class="primary-button full-width">
+            Share measurement
+          </button>
+        </section>
+      </section>
+      <aside class="stack">
+        <section class="card">
+          <h2>A useful reading starts here</h2>
+          <div class="verification-step">
+            <span>1</span>
+            <div>
+              <strong>Go outside after dark</strong>
+              <p>
+                Readings taken while the sun is less than 6? below the horizon are saved as daytime
+                readings and excluded from nighttime route scores.
+              </p>
+            </div>
+          </div>
+          <div class="verification-step">
+            <span>2</span>
+            <div>
+              <strong>Frame the path</strong>
+              <p>
+                Keep the camera steady, turn off flash, and avoid pointing directly into a light
+                source.
+              </p>
+            </div>
+          </div>
+          <div class="verification-step">
+            <span>3</span>
+            <div>
+              <strong>Capture, then choose to share</strong>
+              <p>Location is requested when you capture. Review your reading before sharing it.</p>
+            </div>
+          </div>
+        </section>
+        <section class="card">
+          <h2>What does the score mean?</h2>
+          <p class="hint">
+            The score combines average image luminance and the proportion of dark pixels. It is a
+            camera-based estimate, not a lux measurement. Exposure, weather, and different phones
+            can change the result.
+          </p>
+          <hr class="divider" />
+          <p class="hint">
+            Camera and GPS require HTTPS or localhost. Images are processed in your browser and are
+            never uploaded for measurements.
+          </p>
+        </section>
+      </aside>
+    </main>
+    <footer data-footer></footer>
+  </body>
+</html>

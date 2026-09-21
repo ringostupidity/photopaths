@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Photopath — Report a light</title>
+    <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="/style.css" />
+    <script defer src="/vendor/leaflet/leaflet.js"></script>
+    <script type="module" src="/report.js"></script>
+  </head>
+  <body>
+    <header data-header></header>
+    <main class="content-grid">
+      <section class="card">
+        <p class="eyebrow">A small report. A brighter community.</p>
+        <h1>Report a streetlight</h1>
+        <p class="section-intro">Help others understand the lighting on their route.</p>
+        <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+        <form id="report-form">
+          <div class="form-group">
+            <label for="problem">What's wrong with the light?</label
+            ><select id="problem" required>
+              <option value="">Choose a problem…</option>
+              <option value="broken">Broken</option>
+              <option value="flickering">Flickering</option>
+              <option value="dim">Very dim</option>
+              <option value="off">Completely off</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Where is it?</label>
+            <div
+              id="report-map"
+              class="small-map"
+              aria-label="Click to select the light's location"
+            ></div>
+            <button type="button" id="report-location" class="secondary-button full-width">
+              📍 Use my current location
+            </button>
+            <p id="location-status" class="hint">
+              Click the map, use GPS, or enter coordinates below.
+            </p>
+          </div>
+          <div class="split-fields form-group">
+            <div>
+              <label for="latitude">Latitude</label
+              ><input id="latitude" type="number" step="any" min="-85" max="85" required />
+            </div>
+            <div>
+              <label for="longitude">Longitude</label
+              ><input id="longitude" type="number" step="any" min="-180" max="180" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="description">Description <span class="muted">(optional)</span></label
+            ><textarea
+              id="description"
+              rows="4"
+              maxlength="1000"
+              placeholder="A nearby landmark or details about the problem…"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label for="photo">Photo <span class="muted">(optional)</span></label
+            ><input
+              id="photo"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              capture="environment"
+            /><img id="photo-preview" class="photo-preview" alt="Your report photo" hidden />
+            <p class="hint">
+              Avoid faces and license plates. Photos are resized and location metadata is removed.
+            </p>
+          </div>
+          <label class="check form-group"
+            ><input id="consent" type="checkbox" required />I agree to share this location,
+            description, and optional photo on the community map.</label
+          ><button id="submit-report" class="primary-button full-width">Submit report</button>
+        </form>
+        <div class="privacy-notice">
+          <strong>Your privacy matters</strong>
+          <p>
+            No account or name is required. You can delete contributions from My activity in this
+            browser. Clearing browser cookies removes your access to them.
+          </p>
+        </div>
+      </section>
+      <aside class="card">
+        <h2>How reports help</h2>
+        <div class="verification-step">
+          <span>1</span>
+          <div>
+            <strong>Share what you see</strong>
+            <p>A report appears on the map immediately, marked as unverified.</p>
+          </div>
+        </div>
+        <div class="verification-step">
+          <span>2</span>
+          <div>
+            <strong>Check it together</strong>
+            <p>Other visitors can confirm the problem or report that the light is repaired.</p>
+          </div>
+        </div>
+        <div class="verification-step">
+          <span>3</span>
+          <div>
+            <strong>Add context to routes</strong>
+            <p>
+              Two confirmations mark a report as community corroborated. Nearby measured sections
+              receive a small lighting penalty for recent corroborated reports.
+            </p>
+          </div>
+        </div>
+        <div class="verification-step">
+          <span>4</span>
+          <div>
+            <strong>Keep the map current</strong>
+            <p>
+              Two repair votes mark it community resolved. Votes are limited per browser, not
+              verified identities.
+            </p>
+          </div>
+        </div>
+        <hr class="divider" />
+        <p class="hint">
+          Photopath does not send reports to your city. For repairs or urgent hazards, contact the
+          responsible local service directly.
+        </p>
+        <a class="secondary-button full-width" style="margin-top: 18px" href="/map"
+          >Explore community reports →</a
+        >
+      </aside>
+    </main>
+    <footer data-footer></footer>
+  </body>
+</html>

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Photopath — Map</title>
+    <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="/style.css" />
+    <script defer src="/vendor/leaflet/leaflet.js"></script>
+    <script type="module" src="/map.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header data-header></header>
+    <main id="main">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">A little more light on your way</p>
+          <h1>Your neighborhood, after dark.</h1>
+          <p class="hint">Plan a walk or explore the lighting around you.</p>
+        </div>
+        <a class="secondary-button" href="/measure">📷 Take a measurement</a>
+      </div>
+      <div id="notice" role="status" aria-live="polite" class="notice global-notice" hidden></div>
+      <div class="layout">
+        <section class="map-card" aria-label="Interactive lighting map">
+          <div id="map"></div>
+          <div id="pick-status" class="pick-status" role="status" hidden></div>
+          <div class="map-legend">
+            <strong>Lighting estimates</strong>
+            <div class="legend-row">
+              <span><i class="dot red"></i>Very dark</span
+              ><span><i class="dot orange"></i>Dark</span
+              ><span><i class="dot yellow"></i>Moderate</span
+              ><span><i class="dot green"></i>Well lit</span
+              ><span><i class="dot gray"></i>No lighting data</span>
+            </div>
+          </div>
+        </section>
+        <aside class="panel">
+          <section class="card">
+            <h2>Where are you heading?</h2>
+            <form id="route-form">
+              <div class="form-group">
+                <label for="start">Starting point</label>
+                <div class="field">
+                  <input
+                    id="start"
+                    placeholder="Search a place or address"
+                    autocomplete="off"
+                    maxlength="200"
+                  /><button
+                    id="search-start"
+                    type="button"
+                    class="secondary-button"
+                    aria-label="Search starting point"
+                  >
+                    Find
+                  </button>
+                </div>
+                <div id="start-results" class="results"></div>
+                <button id="pick-start" class="text-button" type="button" aria-pressed="false">
+                  Choose start on map
+                </button>
+                <button id="locate" class="text-button" type="button">
+                  📍 Use my current location
+                </button>
+              </div>
+              <div class="form-group">
+                <label for="destination">Destination</label>
+                <div class="field">
+                  <input
+                    id="destination"
+                    placeholder="Where to?"
+                    autocomplete="off"
+                    maxlength="200"
+                  /><button
+                    id="search-end"
+                    type="button"
+                    class="secondary-button"
+                    aria-label="Search destination"
+                  >
+                    Find
+                  </button>
+                </div>
+                <div id="end-results" class="results"></div>
+                <button id="pick-end" class="text-button" type="button" aria-pressed="false">
+                  Choose destination on map
+                </button>
+              </div>
+              <p class="hint">
+                Choose either point on the map, or drag its pin to adjust it. Press Escape to cancel
+                picking.
+              </p>
+              <div class="form-group">
+                <label for="preference">Route preference</label
+                ><input id="preference" type="range" min="0" max="100" value="50" />
+                <div class="slider-labels">
+                  <span>Fastest</span><span id="preference-value">Balanced</span
+                  ><span>Brightest</span>
+                </div>
+              </div>
+              <button id="route-submit" class="primary-button blue-button full-width">
+                Compare walking routes
+              </button>
+            </form>
+            <div class="button-row" style="margin-top: 10px">
+              <button id="save-favorite" class="text-button">☆ Save destination</button
+              ><button id="clear-route" class="text-button">Clear route</button>
+            </div>
+            <div id="favorites" class="results"></div>
+          </section>
+          <section class="card">
+            <h2>Suggested routes</h2>
+            <div id="routes" class="empty">
+              Set a start and destination to compare walking routes.
+            </div>
+            <details id="directions" hidden>
+              <summary>Walking directions</summary>
+              <ol id="steps" class="steps"></ol>
+            </details>
+            <p class="hint">
+              Scores use camera readings first, then OSM lighting estimates. At least 60% lighting
+              coverage is needed for an overall score. OSM estimates describe mapped infrastructure,
+              not measured brightness.
+            </p>
+          </section>
+          <section class="card">
+            <h2>Lighting nearby</h2>
+            <p id="layer-status" class="hint">Load community data around the map center.</p>
+            <p id="osm-status" class="hint">OSM lighting has not been loaded for this area.</p>
+            <div class="button-row" style="margin: 12px 0">
+              <button id="refresh-data" class="secondary-button">Refresh area</button
+              ><button id="load-lamps" class="secondary-button">Load OSM lighting</button>
+            </div>
+            <label class="check"
+              ><input id="show-measurements" type="checkbox" checked />Nighttime measurements (last
+              30 days)</label
+            ><label class="check"
+              ><input id="show-reports" type="checkbox" checked />Community reports</label
+            ><label class="check"
+              ><input id="show-lamps" type="checkbox" checked />OSM lamps and lighting tags</label
+            >
+            <p class="hint">
+              Searches cover 2 km around the map center. Mapped lights may not be operational. Gold
+              dots are lamps; blue lines are ways tagged lit, gray dashed lines are tagged unlit,
+              and purple lines have other lighting tags. These are not camera measurements.
+            </p>
+          </section>
+          <section class="card">
+            <h3>Know what you're seeing</h3>
+            <p class="hint">
+              Camera scores are experimental, relative estimates. Gray route sections have neither
+              recent readings nor usable OSM lighting data. Dashed colored sections use OSM
+              estimates. Community reports are not official repair records.
+            </p>
+            <hr class="divider" />
+            <p class="hint">
+              Walking routes:
+              <a href="https://routing.openstreetmap.de/about.html">FOSSGIS / OSRM</a> or
+              OpenRouteService. <a href="https://www.openstreetmap.org/fixthemap">Fix the map</a>.
+            </p>
+          </section>
+        </aside>
+      </div>
+    </main>
+    <footer data-footer></footer>
+  </body>
+</html>

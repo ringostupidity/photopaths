@@ -1,35 +1,64 @@
-from flask import Flask, render_template
-
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return render_template("index.html")
-
-if __name__ == "__main__":
-    app.run(debug=True)
-
+from flask import Flask, render_template, request, jsonify
+from supabase import create_client, Client
+import requests
 import os
 
-from supabase import create_client, Client
+# Folder structure:
+#
+# photopaths/
+# ├── app.py
+# ├── templates/
+# │   └── index.html
+# └── static/
+#     ├── css/
+#     ├── js/
+#     └── images/
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder="templates",
+    static_folder="static"
+)
 
-url = os.environ.get("https://gpkwqhlqkpkjtdpnfvdx.supabase.co")
-key = os.environ.get("sb_publishable_osB3mT4QjTEONufpvET4tQ_IvwR6UsC")
 
-supabase: Client = create_client(url, key)
+# -------------------------
+# Supabase
+# -------------------------
+
+url = os.environ.get("SUPABASE_URL")
+key = os.environ.get("SUPABASE_KEY")
+
+supabase: Client | None = None
+
+if url and key:
+    supabase = create_client(url, key)
+
+
+# -------------------------
+# Pages
+# -------------------------
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+# -------------------------
+# Test endpoints
+# -------------------------
+
+@app.route("/api/test")
+def test():
+    return jsonify({"message": "Flask is working!"})
+
 
 @app.route("/test-report")
 def test_report():
+
+    if supabase is None:
+        return jsonify({
+            "error": "Supabase environment variables are not configured."
+        }), 500
 
     response = (
         supabase
@@ -43,44 +72,30 @@ def test_report():
         .execute()
     )
 
-    return {
+    return jsonify({
         "message": "Report saved!",
         "data": response.data
-    }
-
-from flask import request, jsonify, send_from_directory
-import requests
-
-app = Flask(__name__)
+    })
 
 
-# Serve map.html
-@app.route("/")
-def home():
-    #return send_from_directory(".", "index.html")
-    return "running"
+# -------------------------
+# Geocoding
+# -------------------------
 
-# Test endpoint
-@app.route("/api/test")
-def test():
-    return "working"
-    #return jsonify({"message": "Flask is working!"})
-
-
-# Geocode a destination
 @app.route("/api/geocode", methods=["POST"])
 def geocode():
+
     data = request.get_json()
 
     if not data or not data.get("query"):
-        return jsonify({"error": "Please enter a destination."}), 400
-
-    query = data["query"]
+        return jsonify({
+            "error": "Please enter a destination."
+        }), 400
 
     response = requests.get(
         "https://nominatim.openstreetmap.org/search",
         params={
-            "q": query,
+            "q": data["query"],
             "format": "json",
             "limit": 1
         },
@@ -93,7 +108,9 @@ def geocode():
     results = response.json()
 
     if not results:
-        return jsonify({"error": "Destination not found."}), 404
+        return jsonify({
+            "error": "Destination not found."
+        }), 404
 
     place = results[0]
 
@@ -104,9 +121,13 @@ def geocode():
     })
 
 
-# Calculate a route
+# -------------------------
+# Routing
+# -------------------------
+
 @app.route("/api/route", methods=["POST"])
 def route():
+
     data = request.get_json()
 
     if not data or not data.get("start") or not data.get("end"):
@@ -143,7 +164,11 @@ def route():
 
     for index, route in enumerate(route_data["routes"]):
         routes.append({
-            "label": "Recommended route" if index == 0 else "Alternative route",
+            "label": (
+                "Recommended route"
+                if index == 0
+                else "Alternative route"
+            ),
             "duration": round(route["duration"] / 60),
             "distance": route["distance"],
             "score": 0,
@@ -153,6 +178,14 @@ def route():
     return jsonify({"routes": routes})
 
 
+# -------------------------
+# Start server
+# -------------------------
+
 if __name__ == "__main__":
-    print("TEST ROUTE LOADED")
-    app.run(debug=True)
+    print("PhotoPath server running")
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=True
+    )

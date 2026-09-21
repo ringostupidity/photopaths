@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Compare walking routes with community nighttime lighting measurements."
+    />
+    <title>Photopath — Find the brightest path home</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/common.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header data-header></header>
+    <main id="main">
+      <section class="hero">
+        <div class="hero-text">
+          <div class="badge">🌙 Nighttime pedestrian navigation</div>
+          <h1>Find the <span>brightest</span> path home.</h1>
+          <p>
+            See your neighborhood in a different light. Compare walking routes with real-world
+            nighttime lighting information.
+          </p>
+          <div class="hero-buttons">
+            <a class="primary-button" href="/map">Open Map →</a
+            ><a class="secondary-button" href="/report">Report a Light</a>
+          </div>
+        </div>
+        <section class="route-preview" aria-label="Illustrative route comparison">
+          <div class="preview-header"><span>Example routes</span><span>🌙</span></div>
+          <div class="route-card">
+            <div>
+              <strong>⚡ Fastest Route</strong>
+              <p>18 minutes · 1.4 km</p>
+            </div>
+            <div class="score"><strong>42</strong><small>Visibility</small></div>
+          </div>
+          <div class="route-card brightest">
+            <div>
+              <strong>💡 Brightest Route</strong>
+              <p>21 minutes · 1.6 km</p>
+            </div>
+            <div class="score"><strong>88</strong><small>Visibility</small></div>
+          </div>
+          <p class="preview-note">
+            Illustration only. Live routes use contributed measurements and show when lighting data
+            is missing. A bright route is not automatically a safe route.
+          </p>
+        </section>
+      </section>
+      <section class="features">
+        <h2>How Photopath Works</h2>
+        <div class="feature-grid">
+          <a class="card feature-card" href="/measure"
+            ><div class="feature-icon">📷</div>
+            <h3>Measure</h3>
+            <p>
+              Use your camera to estimate the lighting around you. Share a reading when you're
+              ready.
+            </p></a
+          ><a class="card feature-card" href="/map"
+            ><div class="feature-icon">📍</div>
+            <h3>Map</h3>
+            <p>Explore community measurements, mapped streetlights, and reported problems.</p></a
+          ><a class="card feature-card" href="/map"
+            ><div class="feature-icon">🧮</div>
+            <h3>Compare</h3>
+            <p>
+              Balance walking time and nighttime visibility, with data coverage clearly shown.
+            </p></a
+          ><a class="card feature-card" href="/report"
+            ><div class="feature-icon">🚨</div>
+            <h3>Report</h3>
+            <p>Help your community identify broken, flickering, or dim streetlights.</p></a
+          >
+        </div>
+      </section>
+    </main>
+    <footer data-footer></footer>
+  </body>
+</html>

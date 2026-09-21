@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Photopath — My activity</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/settings.js"></script>
+  </head>
+  <body>
+    <header data-header></header>
+    <main class="settings-page">
+      <p class="eyebrow">Your corner of Photopath</p>
+      <h1>My activity</h1>
+      <p class="muted">Manage your contributions, favorite places, and preferences.</p>
+      <div id="notice" role="status" aria-live="polite" class="notice" hidden></div>
+      <div class="settings-grid">
+        <div class="stack">
+          <section class="card">
+            <h2>Preferences</h2>
+            <form id="settings-form">
+              <div class="form-group">
+                <label for="units">Distance units</label
+                ><select id="units">
+                  <option value="km">Kilometres</option>
+                  <option value="mi">Miles</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="default-preference">Default route preference</label
+                ><input id="default-preference" type="range" min="0" max="100" />
+                <div class="slider-labels"><span>Fastest</span><span>Brightest</span></div>
+              </div>
+              <button class="primary-button full-width">Save preferences</button>
+            </form>
+          </section>
+          <section class="card">
+            <h2>Favorite places</h2>
+            <div id="favorites"></div>
+          </section>
+          <section class="card">
+            <h3>Private by default</h3>
+            <p class="hint">
+              Favorites and settings stay in this browser. Contributions are public and stored
+              without your name. A browser cookie lets you manage them; clearing it removes your
+              ability to delete earlier contributions.
+            </p>
+            <hr class="divider" />
+            <p class="hint">
+              Place searches go to Nominatim. Route endpoints go to FOSSGIS or OpenRouteService. Map
+              tiles and streetlight queries go to OpenStreetMap services.
+            </p>
+          </section>
+        </div>
+        <section class="card">
+          <h2>My contributions</h2>
+          <p class="hint">Reports and measurements shared from this browser.</p>
+          <div id="contributions"><p class="empty">Loading your contributions…</p></div>
+        </section>
+      </div>
+    </main>
+    <footer data-footer></footer>
+  </body>
+</html>
