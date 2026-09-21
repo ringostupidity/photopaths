@@ -8,7 +8,8 @@ Photopath obtains candidate walking routes from an external routing service, div
 
 The processing sequence is:
 
-```text
+
+```
 Starting point + destination
     → Candidate walking routes
     → Load camera measurements, community reports, and OSM lighting
@@ -20,6 +21,8 @@ Starting point + destination
     → Combine walking-time cost with darkness/uncertainty cost
     → Recommend the route with the lowest combined cost
 ```
+
+
 
 Photopath does not implement its own street-network shortest-path solver. Its main routing contribution is the lighting analysis and reranking of the alternatives returned by the provider. A better-lit path absent from those alternatives cannot be selected by this algorithm.
 
