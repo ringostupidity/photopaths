@@ -7,3 +7,5 @@ playwright-report/
 *.log
 __pycache__/
 .venv/
+.vercel/
+public/vendor/

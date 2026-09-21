@@ -42,10 +42,16 @@ async function photo(value) {
     throw new HttpError(400, 'This photo could not be read. Choose a different image.');
   }
 }
-export function createApp({ store, providers, secret, production = false, limits = true }) {
+export function createApp({
+  store,
+  providers,
+  secret,
+  production = false,
+  limits = true,
+  app = express(),
+}) {
   if (!secret || secret.length < 32)
     throw new Error('SESSION_SECRET must have at least 32 characters.');
-  const app = express();
   app.disable('x-powered-by');
   app.use(
     helmet({

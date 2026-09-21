@@ -24,6 +24,25 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 The Upstash URL must start with `rediss://`. This app uses the Redis protocol on port 6379, not Upstash REST credentials. Database credentials never go to the browser. No SQL migrations or table setup are needed. All Redis keys are namespaced under `photopath:v1`.
 
+## Deploy to Vercel
+
+The repository includes `app.js` (the exported Express application), `vercel.json`, and a build script that copies Leaflet assets into `public/`. Local development still uses `server.js`.
+
+1. Commit and push the project to GitHub. `.env` is ignored; do not add it to Git.
+2. In Vercel, select **Add New > Project**, connect GitHub, and import this repository.
+3. Use **Express** as the framework preset, repository root as the root directory, `npm run build` as the build command, and `npm install` as the install command. Leave the output directory at the framework default. Choose Node.js **24.x**.
+4. Add environment variables in Vercel for Production and Preview:
+   - `UPSTASH_REDIS_URL`: the complete `rediss://...` value from your local environment.
+   - `SESSION_SECRET`: your existing secret, or a newly generated stable secret of at least 32 characters.
+   - `APP_USER_AGENT`: `Photopath/1.0 (https://YOUR-PROJECT.vercel.app)`.
+   - `ORS_API_KEY`: optional, only if you have an OpenRouteService key.
+     No `HOST` or `PORT` variable is needed. The Vercel entry point enables secure cookies.
+5. Click **Deploy**, then visit `/api/health` on the deployed URL. It should return `status: ok` and `database: Upstash Redis`. Check the map, place search, route comparison, and phone camera over HTTPS.
+
+Vercel does not read your local `.env` during deployment. Environment changes require a redeploy. Keep the session secret stable so existing users can still manage their contributions. To isolate preview data, use a separate Upstash database for Preview.
+
+This setup has been checked locally; deployment itself requires your Vercel account. Vercel scales instances automatically, while this prototype's map-provider throttles and application rate limits are per instance. Use shared throttling/caching and appropriately provisioned providers for public traffic, as described below.
+
 ## Included flows
 
 - **Home:** original branding, responsive cards, illustrative route comparison, and navigation.

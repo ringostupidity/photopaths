@@ -1,0 +1,9 @@
+.env
+.env.*
+app.py
+templates/
+test/
+test-results/
+playwright-report/
+.venv/
+__pycache__/
